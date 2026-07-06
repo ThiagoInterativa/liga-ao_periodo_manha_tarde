@@ -1,10 +1,3 @@
-O seu código original continha vários blocos desconexos, variáveis indefinidas (`email` e `senha` vazios, `tempo_total`, `tma`), funções cortadas pela metade (como a parte do Ranking e a exibição final), além de um trecho solto de HTML e problemas na indentação do loop da busca.
-
-Eu juntei todas as pontas, corrigi a estrutura das funções, unifiquei o cálculo de KPIs/TMA dentro da função `calcular_kpi`, criei a lógica para o `ranking` baseado na fila/técnico e arrumei a interface do Streamlit para exibir tudo de forma organizada.
-
-Aqui está o código completo e corrigido:
-
-```python
 import time
 from datetime import datetime, time as datetime_time
 import requests
@@ -18,8 +11,8 @@ login_url = "https://pabx.evence.com.br/login"
 cdr_url = "https://pabx.evence.com.br/cdr/pesquisar"
 
 # Adicione suas credenciais aqui
-email = "seu_email@exemplo.com"
-senha = "sua_senha"
+email = "suporte@interativanet.com.br"
+senha = "smk03657"
 
 
 # =========================================================
@@ -71,7 +64,7 @@ def request_com_retry(session, url, params, headers, tentativas=4):
 # =========================================================
 # BUSCA CDR (SEM CACHE PARA NÃO QUEBRAR UI)
 # =========================================================
-def buscar_cdr(data_inicio, data_fim, progress_ui=None):
+def buscar_cdr(data_inicio, data_fim, status_container=None):
     session = login_pabx()
 
     data_inicio_dt = datetime.strptime(data_inicio, "%Y-%m-%d")
@@ -106,20 +99,11 @@ def buscar_cdr(data_inicio, data_fim, progress_ui=None):
     dados = []
     pagina = 1
 
-    if progress_ui:
-        progress_bar = progress_ui.progress(0)
-        status_text = st.empty()
-    else:
-        progress_bar = None
-        status_text = None
-
-    total_estimado = 70
-
     while True:
         payload["page"] = pagina
 
-        if status_text:
-            status_text.text(f"📄 Processando página {pagina}")
+        if status_container:
+            status_container.markdown(f"⏳ **Buscando dados... Processando página {pagina}**")
 
         r = request_com_retry(session, cdr_url, payload, headers)
         soup = BeautifulSoup(r.text, "html.parser")
@@ -162,17 +146,8 @@ def buscar_cdr(data_inicio, data_fim, progress_ui=None):
                     }
                 )
 
-        if progress_bar:
-            progresso = min(pagina / total_estimado, 1.0)
-            progress_bar.progress(progresso)
-
         pagina += 1
         time.sleep(0.3)
-
-    if progress_ui:
-        progress_ui.empty()
-        if status_text:
-            status_text.empty()
 
     return dados
 
@@ -206,7 +181,6 @@ def calcular_kpi(dados):
         elif inicio_tarde <= hora <= fim_tarde:
             total_tarde += 1
 
-    # Cálculos extras baseados nos blocos soltos do seu código
     tempo_total_horas = tempo_total / 3600
     horas_fmt = int(tempo_total // 3600)
     minutos_fmt = int((tempo_total % 3600) // 60)
@@ -219,7 +193,7 @@ def calcular_kpi(dados):
     tma_formatado = f"{tma_minutos:02d}:{tma_segundos:02d}"
 
     alertas = []
-    if tma > 300:  # Exemplo: Alerta se TMA for maior que 5 minutos
+    if tma > 300:
         alertas.append("⚠️ O Tempo Médio de Atendimento (TMA) está acima do esperado!")
 
     return {
@@ -301,13 +275,15 @@ if submit:
         if not data_inicio or not data_fim:
             st.error("Preencha as datas")
         else:
-            progress_ui = st.empty()
+            status_container = st.info("🔍 Iniciando integração e login...")
 
-            dados = buscar_cdr(str(data_inicio), str(data_fim), progress_ui)
+            dados = buscar_cdr(str(data_inicio), str(data_fim), status_container)
 
             if not dados:
-                st.error("Nenhum dado encontrado")
+                status_container.error("Nenhum dado encontrado para o período.")
             else:
+                status_container.success("✅ Dados carregados com sucesso!")
+
                 resultado = calcular_kpi(dados)
                 ranking = gerar_ranking(dados)
 
@@ -352,5 +328,3 @@ if submit:
 
     except Exception as e:
         st.error(f"Ocorreu um erro: {e}")
-
-```
