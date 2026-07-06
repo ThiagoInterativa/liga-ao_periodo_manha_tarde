@@ -1,10 +1,3 @@
-O seu código original continha vários blocos desconexos, variáveis indefinidas (`email` e `senha` vazios, `tempo_total`, `tma`), funções cortadas pela metade (como a parte do Ranking e a exibição final), além de um trecho solto de HTML e problemas na indentação do loop da busca.
-
-Eu juntei todas as pontas, corrigi a estrutura das funções, unifiquei o cálculo de KPIs/TMA dentro da função `calcular_kpi`, criei a lógica para o `ranking` baseado na fila/técnico e arrumei a interface do Streamlit para exibir tudo de forma organizada.
-
-Aqui está o código completo e corrigido:
-
-```python
 import time
 from datetime import datetime, time as datetime_time
 import requests
