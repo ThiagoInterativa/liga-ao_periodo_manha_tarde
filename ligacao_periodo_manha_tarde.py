@@ -252,7 +252,7 @@ def gerar_ranking(dados):
 # =========================================================
 st.markdown(
     """
-    <h1 style='white-space: nowrap; margin-bottom: 20px;'>
+    <h1 style='text-align: center; font-size: 28px; white-space: nowrap; margin-bottom: 20px;'>
         ☎️ Dashboard de ligações - Por periodo
     </h1>
     """, 
