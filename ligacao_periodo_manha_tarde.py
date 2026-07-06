@@ -250,7 +250,7 @@ def gerar_ranking(dados):
 # =========================================================
 # INTERFACE STREAMLIT
 # =========================================================
-st.title("📊 Dashboard de ligações - Helpdesk")
+st.title("☎️ Dashboard de ligações - Por periodo")
 
 with st.form("form"):
     col1, col2, col3 = st.columns(3)
