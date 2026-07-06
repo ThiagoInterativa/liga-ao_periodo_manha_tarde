@@ -297,8 +297,8 @@ if submit:
                 # Exibição dos Cards de Métrica
                 m1, m2, m3 = st.columns(3)
                 m1.metric("📞 Total Atendidas", resultado["total"])
-                m2.metric("🌞 Manhã (08:15 às 13:00)", resultado["manha"])
-                m3.metric("🌙 Tarde (13:00 às 21:00)", resultado["tarde"])
+                m2.metric("🌞 Manhã ", resultado["manha"])
+                m3.metric("🌙 Tarde ", resultado["tarde"])
 
                 st.markdown("---")
 
